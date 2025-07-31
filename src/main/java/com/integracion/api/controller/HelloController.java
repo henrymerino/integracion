@@ -56,6 +56,6 @@ public class HelloController {
     //Otro comentario
     @GetMapping("/hello9")
     public String saludar9(){
-        return "Hola Mundo con REST en Spring Boot Cambiado 2";
+        return "Hola Mundo con REST en Spring Boot Cambiado 3";
     }
 }
