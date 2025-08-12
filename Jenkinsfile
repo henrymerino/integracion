@@ -22,7 +22,7 @@ pipeline {
             steps {
                 checkout([
                     $class: 'GitSCM',
-                    branches: [[name: '*/main']],
+                    branches: [[name: '*/feature/integraciontest']],
                     userRemoteConfigs: [[url: 'https://github.com/henrymerino/integracion.git']]
                 ])
             }
