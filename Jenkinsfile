@@ -6,16 +6,18 @@ pipeline {
     }
 
     options {
-        buildDiscarder logRotator(
-            daysToKeepStr: '15',
-            numToKeepStr: '10'
-        )
+        buildDiscarder logRotator(daysToKeepStr: '15', numToKeepStr: '10')
     }
 
     environment {
         APP_NAME      = "INTEGRACION_APP"
         APP_ENV       = "MAIN"
-        SONARQUBE_ENV = "SonarQube25"  // Cambia por el nombre de tu SonarQube en Jenkins
+        SONARQUBE_ENV = "SonarQube25"  // Cambia esto si tu servidor SonarQube tiene otro nombre
+    }
+
+    triggers {
+        // Ejecuta el pipeline automáticamente cuando hay un push a Git
+        pollSCM('* * * * *')  // Revisa cada minuto (puedes ajustar si lo deseas)
     }
 
     stages {
@@ -26,7 +28,7 @@ pipeline {
                     branches: [[name: '*/feature/integraciontest']],
                     userRemoteConfigs: [[
                         url: 'https://github.com/henrymerino/integracion.git',
-                        credentialsId: 'gitIntegracion' // Cambia esto por tu ID real
+                        credentialsId: 'gitIntegracion'
                     ]]
                 ])
             }
@@ -48,19 +50,9 @@ pipeline {
 
         stage('Esperar resultados de SonarQube') {
             steps {
-                // Espera a que termine el análisis y valida calidad
                 timeout(time: 1, unit: 'MINUTES') {
                     waitForQualityGate abortPipeline: true
                 }
-            }
-        }
-
-        stage('Generar archivo en workspace') {
-            steps {
-                sh '''
-                    echo "Este es un archivo de prueba del workspace" > workspace_test.txt
-                    ls -la
-                '''
             }
         }
 
@@ -76,16 +68,22 @@ pipeline {
             }
         }
 
-        stage('Hacer merge a main') {
+        stage('Validar y hacer merge a main') {
             steps {
-                script {
+                withCredentials([usernamePassword(credentialsId: 'gitIntegracion', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_TOKEN')]) {
                     sh '''
+                        git config user.name "$GIT_USER"
                         git config user.email "haguilarmerino@gmail.com"
-                        git config user.name "henrymerino"
 
+                        git remote set-url origin https://$GIT_USER:$GIT_TOKEN@github.com/henrymerino/integracion.git
+
+                        # Validar que el branch existe localmente
+                        git fetch origin
                         git checkout main
                         git pull origin main
-                        git merge origin/feature/integraciontest --no-ff -m "Merge automático desde Jenkins"
+
+                        git merge origin/feature/integraciontest --no-ff -m "Merge automático desde Jenkins" || exit 1
+
                         git push origin main
                     '''
                 }
