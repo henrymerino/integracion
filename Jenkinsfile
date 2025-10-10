@@ -91,18 +91,19 @@ pipeline {
             }
         }
     }
-}
-
-// 👇 Notificaciones de Slack al final del pipeline
-    post {
-        success {
-            slackNotify("✅ *Pipeline exitoso* `${env.JOB_NAME}` #${env.BUILD_NUMBER} - <${env.BUILD_URL}|Ver detalles>")
-        }
-        failure {
-            slackNotify("❌ *Pipeline fallido* `${env.JOB_NAME}` #${env.BUILD_NUMBER} - <${env.BUILD_URL}|Ver detalles>")
+    // 👇 Notificaciones de Slack al final del pipeline
+        post {
+            success {
+                slackNotify("✅ *Pipeline exitoso* `${env.JOB_NAME}` #${env.BUILD_NUMBER} - <${env.BUILD_URL}|Ver detalles>")
+            }
+            failure {
+                slackNotify("❌ *Pipeline fallido* `${env.JOB_NAME}` #${env.BUILD_NUMBER} - <${env.BUILD_URL}|Ver detalles>")
+            }
         }
     }
 }
+
+
 
 // 👇 Función para enviar mensajes a Slack
 def slackNotify(String message) {
