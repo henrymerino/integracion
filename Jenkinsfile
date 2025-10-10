@@ -1,3 +1,5 @@
+def qualityPassed = false
+
 pipeline {
     agent { label 'docker-agent' }
 
@@ -16,9 +18,7 @@ pipeline {
         SLACK_WEBHOOK_URL  = credentials('slackWebhook')
     }
 
-    triggers {
-        pollSCM('* * * * *')
-    }
+ 
 
     stages {
         stage('Checkout Código') {
@@ -51,7 +51,13 @@ pipeline {
         stage('Esperar resultados de SonarQube') {
             steps {
                 timeout(time: 5, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
+                    script {
+                        def qualityGate = waitForQualityGate()
+                        if (qualityGate.status != 'OK') {
+                            error "❌ Quality Gate no aprobado: ${qualityGate.status}"
+                        }
+                        qualityPassed = true
+                    }
                 }
             }
         }
@@ -69,6 +75,9 @@ pipeline {
         }
 
         stage('Validar y hacer merge a main') {
+            when {
+                expression { return qualityPassed }
+            }
             steps {
                 withCredentials([usernamePassword(credentialsId: 'gitIntegracion', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_TOKEN')]) {
                     sh '''
@@ -90,7 +99,6 @@ pipeline {
         }
     }
 
-    // ✅ Esto sí va dentro del `pipeline` pero fuera de `stages`
     post {
         success {
             slackNotify("✅ *Pipeline exitoso* `${env.JOB_NAME}` #${env.BUILD_NUMBER} - <${env.BUILD_URL}|Ver detalles>")
@@ -101,7 +109,7 @@ pipeline {
     }
 }
 
-// ✅ Esta función sí debe ir fuera del `pipeline`
+// Función para enviar mensajes a Slack
 def slackNotify(String message) {
     sh """
         curl -X POST -H 'Content-type: application/json' \
