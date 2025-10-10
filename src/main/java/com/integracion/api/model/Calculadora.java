@@ -55,6 +55,6 @@ public class Calculadora {
         c.dividir(8, 0); // ⚠️ División por cero no controlada
         c.operacionLarga();
     }
-    
+
  */
 }
