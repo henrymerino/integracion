@@ -10,15 +10,14 @@ pipeline {
     }
 
     environment {
-        APP_NAME      = "INTEGRACION_APP"
-        APP_ENV       = "MAIN"
-        SONARQUBE_ENV = "SonarQube25"  // Cambia esto si tu servidor SonarQube tiene otro nombre
-         SLACK_WEBHOOK_URL = credentials('slackWebhook')
+        APP_NAME           = "INTEGRACION_APP"
+        APP_ENV            = "MAIN"
+        SONARQUBE_ENV      = "SonarQube25"
+        SLACK_WEBHOOK_URL  = credentials('slackWebhook')
     }
 
     triggers {
-        // Ejecuta el pipeline automáticamente cuando hay un push a Git
-        pollSCM('* * * * *')  // Revisa cada minuto (puedes ajustar si lo deseas)
+        pollSCM('* * * * *')
     }
 
     stages {
@@ -78,7 +77,6 @@ pipeline {
 
                         git remote set-url origin https://$GIT_USER:$GIT_TOKEN@github.com/henrymerino/integracion.git
 
-                        # Validar que el branch existe localmente
                         git fetch origin
                         git checkout main
                         git pull origin main
@@ -91,25 +89,23 @@ pipeline {
             }
         }
     }
-    // 👇 Notificaciones de Slack al final del pipeline
-        post {
-            success {
-                slackNotify("✅ *Pipeline exitoso* `${env.JOB_NAME}` #${env.BUILD_NUMBER} - <${env.BUILD_URL}|Ver detalles>")
-            }
-            failure {
-                slackNotify("❌ *Pipeline fallido* `${env.JOB_NAME}` #${env.BUILD_NUMBER} - <${env.BUILD_URL}|Ver detalles>")
-            }
+
+    // ✅ Esto sí va dentro del `pipeline` pero fuera de `stages`
+    post {
+        success {
+            slackNotify("✅ *Pipeline exitoso* `${env.JOB_NAME}` #${env.BUILD_NUMBER} - <${env.BUILD_URL}|Ver detalles>")
+        }
+        failure {
+            slackNotify("❌ *Pipeline fallido* `${env.JOB_NAME}` #${env.BUILD_NUMBER} - <${env.BUILD_URL}|Ver detalles>")
         }
     }
 }
 
-
-
-// 👇 Función para enviar mensajes a Slack
+// ✅ Esta función sí debe ir fuera del `pipeline`
 def slackNotify(String message) {
     sh """
         curl -X POST -H 'Content-type: application/json' \
-        --data '{ "text": "${message}" }' \
-        ${SLACK_WEBHOOK_URL}
+        --data '{\"text\": \"${message}\"}' \
+        ${env.SLACK_WEBHOOK_URL}
     """
 }
