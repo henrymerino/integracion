@@ -9,6 +9,7 @@ pipeline {
         buildDiscarder logRotator(daysToKeepStr: '15', numToKeepStr: '10')
     }
 
+
     environment {
         APP_NAME           = "INTEGRACION_APP"
         APP_ENV            = "MAIN"
