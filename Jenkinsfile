@@ -13,6 +13,7 @@ pipeline {
         APP_NAME      = "INTEGRACION_APP"
         APP_ENV       = "MAIN"
         SONARQUBE_ENV = "SonarQube25"  // Cambia esto si tu servidor SonarQube tiene otro nombre
+         SLACK_WEBHOOK_URL = credentials('slackWebhook')
     }
 
     triggers {
@@ -90,4 +91,24 @@ pipeline {
             }
         }
     }
+}
+
+// 👇 Notificaciones de Slack al final del pipeline
+    post {
+        success {
+            slackNotify("✅ *Pipeline exitoso* `${env.JOB_NAME}` #${env.BUILD_NUMBER} - <${env.BUILD_URL}|Ver detalles>")
+        }
+        failure {
+            slackNotify("❌ *Pipeline fallido* `${env.JOB_NAME}` #${env.BUILD_NUMBER} - <${env.BUILD_URL}|Ver detalles>")
+        }
+    }
+}
+
+// 👇 Función para enviar mensajes a Slack
+def slackNotify(String message) {
+    sh """
+        curl -X POST -H 'Content-type: application/json' \
+        --data '{ "text": "${message}" }' \
+        ${SLACK_WEBHOOK_URL}
+    """
 }
