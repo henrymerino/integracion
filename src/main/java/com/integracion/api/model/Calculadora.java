@@ -1,7 +1,7 @@
 package com.integracion.api.model;
 
 public class Calculadora {
-
+/*
     private int resultado = 0;
     private int unusedVariable = 42;
 
@@ -55,4 +55,6 @@ public class Calculadora {
         c.dividir(8, 0); // ⚠️ División por cero no controlada
         c.operacionLarga();
     }
+    
+ */
 }
