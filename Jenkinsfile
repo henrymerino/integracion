@@ -1,5 +1,3 @@
-def qualityPassed = false
-
 pipeline {
     agent { label 'docker-agent' }
 
@@ -17,8 +15,6 @@ pipeline {
         SONARQUBE_ENV      = "SonarQube25"
         SLACK_WEBHOOK_URL  = credentials('slackWebhook')
     }
-
- 
 
     stages {
         stage('Checkout Código') {
@@ -56,7 +52,7 @@ pipeline {
                         if (qualityGate.status != 'OK') {
                             error "❌ Quality Gate no aprobado: ${qualityGate.status}"
                         }
-                        qualityPassed = true
+                        currentBuild.description = 'QualityGate: OK'
                     }
                 }
             }
@@ -76,7 +72,9 @@ pipeline {
 
         stage('Validar y hacer merge a main') {
             when {
-                expression { return qualityPassed }
+                expression {
+                    return currentBuild.description == 'QualityGate: OK'
+                }
             }
             steps {
                 withCredentials([usernamePassword(credentialsId: 'gitIntegracion', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_TOKEN')]) {
@@ -109,7 +107,6 @@ pipeline {
     }
 }
 
-// Función para enviar mensajes a Slack
 def slackNotify(String message) {
     sh """
         curl -X POST -H 'Content-type: application/json' \
