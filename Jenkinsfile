@@ -18,10 +18,10 @@ pipeline {
         SLACK_WEBHOOK_URL  = credentials('slackWebhook')
     }
 
-    triggers {
-    
+  /*  triggers {
+
      //pollSCM('* * * * *')
-    }
+    }*/
 
     stages {
         stage('Checkout Código') {
