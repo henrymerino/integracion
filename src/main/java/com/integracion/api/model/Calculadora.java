@@ -1,7 +1,7 @@
 package com.integracion.api.model;
 
 public class Calculadora {
-/*
+
     private int resultado = 0;
     private int unusedVariable = 42;
 
@@ -56,5 +56,5 @@ public class Calculadora {
         c.operacionLarga();
     }
 
- */
+
 }
