@@ -47,7 +47,7 @@ pipeline {
 
         stage('Esperar resultados de SonarQube') {
             steps {
-                timeout(time: 5, unit: 'MINUTES') {
+                timeout(time: 15, unit: 'MINUTES') {
                     script {
                         def qualityGate = waitForQualityGate()
                         if (qualityGate.status != 'OK') {
