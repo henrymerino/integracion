@@ -12,4 +12,5 @@ public class Calculadora {
     public void setResultado(int resultado) {
         this.resultado = resultado;
     }
+    
 }
