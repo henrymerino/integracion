@@ -97,6 +97,24 @@ pipeline {
             }
         }
 
+        stage('Diagnóstico Agente') {
+            steps {
+                sh '''
+                    echo "HOSTNAME:"
+                    hostname
+
+                    echo "USER:"
+                    whoami
+
+                    echo "DOCKER:"
+                    which docker || true
+
+                    echo "PATH:"
+                    echo $PATH
+                '''
+            }
+        }
+
         stage('Diagnóstico Docker') {
             steps {
                 sh '''
