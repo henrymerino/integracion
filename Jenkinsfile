@@ -102,8 +102,10 @@ pipeline {
             steps {
                 sh '''
                     hostname
+                    whoami
                     which docker
                     docker --version
+                    docker ps
                 '''
             }
         }
