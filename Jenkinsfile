@@ -97,6 +97,17 @@ pipeline {
             }
         }
 
+        stage('Diagnóstico Docker') {
+                    steps {
+                        sh '''
+                            whoami
+                            pwd
+                            which docker || true
+                            docker --version || true
+                            ls -l /var/run/docker.sock || true
+                        '''
+                    }
+        }
 
 		stage('Build Docker Image') {
 			when {
@@ -130,6 +141,7 @@ pipeline {
 				'''
 			}
 	    }
+
 
 }
 
