@@ -98,15 +98,30 @@ pipeline {
         }
 
         stage('Diagnóstico Docker') {
-                    steps {
-                        sh '''
-                            whoami
-                            pwd
-                            which docker || true
-                            docker --version || true
-                            ls -l /var/run/docker.sock || true
-                        '''
-                    }
+            steps {
+                sh '''
+                    echo "===== USUARIO ====="
+                    whoami
+
+                    echo "===== ID ====="
+                    id
+
+                    echo "===== DIRECTORIO ====="
+                    pwd
+
+                    echo "===== PATH ====="
+                    echo $PATH
+
+                    echo "===== DOCKER ====="
+                    which docker || true
+
+                    echo "===== VERSION DOCKER ====="
+                    docker --version || true
+
+                    echo "===== SOCKET ====="
+                    ls -l /var/run/docker.sock || true
+                '''
+            }
         }
 
 		stage('Build Docker Image') {
