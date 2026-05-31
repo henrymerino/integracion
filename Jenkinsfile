@@ -1,5 +1,6 @@
 pipeline {
-    agent { label 'docker-agent' }
+   // agent { label 'docker-agent' }
+    agent any
 
     tools {
         maven 'maven3'
@@ -94,6 +95,16 @@ pipeline {
                         git push origin main
                     '''
                 }
+            }
+        }
+
+        stage('Verificar Docker') {
+            steps {
+                sh '''
+                    hostname
+                    which docker
+                    docker --version
+                '''
             }
         }
 
