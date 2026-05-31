@@ -161,6 +161,7 @@ pipeline {
 					return currentBuild.description == 'QualityGate: OK'
 				}
 			}
+			//${BUILD_NUMBER} es una variable de entorno automática de Jenkins que contiene el número consecutivo de la ejecución actual del pipeline.
 			steps {
 				sh '''
 					docker build -t integracion-app:${BUILD_NUMBER} .
