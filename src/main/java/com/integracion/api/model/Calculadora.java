@@ -13,5 +13,4 @@ public class Calculadora {
         this.resultado = resultado;
     }
 
-
 }
