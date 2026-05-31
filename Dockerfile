@@ -2,7 +2,7 @@ FROM eclipse-temurin:17-jre
 
 WORKDIR /app
 
-COPY target/*.jar integracion-springboot.jar
+COPY target/integracion-springboot.jar .
 
 EXPOSE 8080
 
