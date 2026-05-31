@@ -96,41 +96,45 @@ pipeline {
                 }
             }
         }
-    }
-    stage('Build Docker Image') {
-        when {
-            expression {
-                return currentBuild.description == 'QualityGate: OK'
-            }
-        }
-        steps {
-            sh '''
-                docker build -t integracion-app:${BUILD_NUMBER} .
-                docker tag integracion-app:${BUILD_NUMBER} integracion-app:latest
-            '''
-        }
-    }
 
-    stage('Deploy Docker Container') {
-        when {
-            expression {
-                return currentBuild.description == 'QualityGate: OK'
-            }
-        }
-        steps {
-            sh '''
-                docker stop integracion-app || true
-                docker rm integracion-app || true
 
-                docker run -d \
-                    --name integracion-app \
-                    -p 8080:8080 \
-                    integracion-app:latest
-            '''
-        }
-    }
+		stage('Build Docker Image') {
+			when {
+				expression {
+					return currentBuild.description == 'QualityGate: OK'
+				}
+			}
+			steps {
+				sh '''
+					docker build -t integracion-app:${BUILD_NUMBER} .
+					docker tag integracion-app:${BUILD_NUMBER} integracion-app:latest
+				'''
+			}
+		}
 
-    post {
+		stage('Deploy Docker Container') {
+			when {
+				expression {
+					return currentBuild.description == 'QualityGate: OK'
+				}
+			}
+			steps {
+				sh '''
+					docker stop integracion-app || true
+					docker rm integracion-app || true
+
+					docker run -d \
+						--name integracion-app \
+						-p 8080:8080 \
+						integracion-app:latest
+				'''
+			}
+	    }
+
+}
+
+
+post {
         success {
             slackNotify("✅ *Pipeline exitoso* `${env.JOB_NAME}` #${env.BUILD_NUMBER} - <${env.BUILD_URL}|Ver detalles>")
         }
